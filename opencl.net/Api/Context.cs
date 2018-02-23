@@ -16,9 +16,11 @@ namespace opencl.Api
 
 	public class Contexts : List<Context> {
 		public Contexts(Devices devices) {
-			var deviceIds = devices.Select(device => device.Handle).ToArray();
+			var deviceIdGroup = devices.GroupBy(device => device.Platform).Select(g => g.ToList().Select(d => d.Handle).ToArray()).ToList();
 			ErrorCode result;
-			this.Add(new Context(OpenCL.clCreateContext(null, (uint)deviceIds.Length, deviceIds, null, default(IntPtr), out result)));
+			foreach (var deviceIds in deviceIdGroup) {
+				this.Add(new Context(OpenCL.clCreateContext(null, (uint)deviceIds.Length, deviceIds, null, default(IntPtr), out result)));
+			}
 		}
 	}
 }
