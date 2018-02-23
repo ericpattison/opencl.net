@@ -7,9 +7,11 @@ using opencl.wrapper.enums;
 namespace opencl.Api {
     public class Device {
         public IntPtr Handle { get; private set; }
+		public Platform Platform { get; private set; }
 
-        public Device(IntPtr handle) {
+        public Device(IntPtr handle, Platform platform) {
             Handle = handle;
+			Platform = platform;
         }
     }
 
@@ -17,10 +19,9 @@ namespace opencl.Api {
         public Devices(Platforms platforms) {
 			var handles = new List<IntPtr>();
 			foreach(var platform in platforms) {
-				handles.AddRange(GetDeviceIds(platform));
+				var deviceIds = GetDeviceIds(platform);
+				this.AddRange(deviceIds.Select(deviceId => new Device(deviceId, platform)));
 			}
-
-			this.AddRange(handles.Select(handle => new Device(handle)));
         }
 
         private List<IntPtr> GetDeviceIds(Platform platform, DeviceType type = DeviceType.All) {
